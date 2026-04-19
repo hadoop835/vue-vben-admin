@@ -44,7 +44,7 @@ export default function registerConnect(lf: LogicFlow) {
         ];
       }
       getDefaultAnchor() {
-        const { id, x, y, width, height } = this;
+        const { id, x, y, width, _ } = this;
         const anchors = [];
         anchors.push({
           x: x - width / 2,
