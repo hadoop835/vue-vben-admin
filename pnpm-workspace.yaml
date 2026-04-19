@@ -80,6 +80,9 @@ catalog:
   '@vueuse/core': ^14.2.1
   '@vueuse/integrations': ^14.2.1
   '@vueuse/motion': ^3.0.3
+  '@logicflow/core': ^2.2.1
+  '@logicflow/extension': ^2.2.1
+  '@logicflow/vue-node-registry': ^1.2.1
   ant-design-vue: ^4.2.6
   antdv-next: ^1.1.9
   archiver: ^7.0.1

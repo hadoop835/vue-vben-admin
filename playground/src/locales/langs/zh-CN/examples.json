@@ -84,5 +84,8 @@
   },
   "tiptap": {
     "title": "富文本编辑器"
+  },
+  "liteflow": {
+    "title": "业务流编排"
   }
 }

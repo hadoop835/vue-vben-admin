@@ -18,6 +18,20 @@ const SvgWeChatIcon = createIconifyIcon('svg:wechat');
 const SvgDingDingIcon = createIconifyIcon('svg:dingding');
 const SvgTDesignIcon = createIconifyIcon('svg:tdesign-logo');
 const SvgAntdvNextLogoIcon = createIconifyIcon('svg:antdv-next-logo');
+//liteflow
+const SvgLiteflowStartIcon = createIconifyIcon('svg:liteflow-start');
+const SvgLiteflowEndIcon = createIconifyIcon('svg:liteflow-end');
+const SvgLiteflowWhenIcon = createIconifyIcon('svg:liteflow-when');
+const SvgLiteflowForIcon = createIconifyIcon('svg:liteflow-for');
+const SvgLiteflowSwitchIcon = createIconifyIcon('svg:liteflow-switch');
+const SvgLiteflowIteratorIcon = createIconifyIcon('svg:liteflow-iterator');
+const SvgLiteflowIfIcon = createIconifyIcon('svg:liteflow-if');
+const SvgLiteflowSummaryIcon = createIconifyIcon('svg:liteflow-summary');
+const SvgLiteflowCommonIcon = createIconifyIcon('svg:liteflow-common');
+
+//
+const SvgSplitLeft = createIconifyIcon('svg:left');
+const SvgSplitRight = createIconifyIcon('svg:right');
 
 export {
   SvgAntdvLogoIcon,
@@ -36,4 +50,15 @@ export {
   SvgQQChatIcon,
   SvgTDesignIcon,
   SvgWeChatIcon,
+  SvgLiteflowStartIcon,
+  SvgLiteflowEndIcon,
+  SvgLiteflowWhenIcon,
+  SvgLiteflowForIcon,
+  SvgLiteflowSwitchIcon,
+  SvgLiteflowIteratorIcon,
+  SvgLiteflowIfIcon,
+  SvgLiteflowSummaryIcon,
+  SvgLiteflowCommonIcon,
+  SvgSplitLeft,
+  SvgSplitRight,
 };

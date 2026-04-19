@@ -133,6 +133,10 @@
       "path": "packages/effects/layouts"
     },
     {
+      "name": "@vben/liteflow",
+      "path": "packages/effects/liteflow"
+    },
+    {
       "name": "@vben/plugins",
       "path": "packages/effects/plugins"
     },

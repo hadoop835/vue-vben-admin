@@ -371,6 +371,15 @@ const routes: RouteRecordRaw[] = [
           title: $t('examples.tiptap.title'),
         },
       },
+      {
+        name: 'liteflowExample',
+        path: 'examples/liteflow',
+        component: () => import('#/views/examples/liteflow/index.vue'),
+        meta: {
+          icon: 'lucide:square-pen',
+          title: $t('examples.liteflow.title'),
+        },
+      },
     ],
   },
 ];
