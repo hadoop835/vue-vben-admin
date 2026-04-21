@@ -3,7 +3,7 @@
   <div class="flex flex-col">
     <!-- 顶部：固定高度 -->
     <div class="h-16 flex items-center justify-center pl-2">
-      <toolbar></toolbar>
+      <toolbar v-if="showLf" :lf="lfInstance" :title="title"></toolbar>
     </div>
 
     <!-- 中间：自适应高度（核心） -->
@@ -13,15 +13,17 @@
         <dnd v-if="showLf" :lf="lfInstance"></dnd>
       </div>
       <!-- 中间：自适应宽度（核心：flex-1） -->
-      <div class="flex-1 flex text-center pr-3">
-        <div class="flex-1 text-center pr-3">
+      <div class="flex-1 flex text-center pr-3 relative">
+        <div class="flex-1 text-center pr-3 pt-1">
           <div ref="container" style="width: 100%; height: 100%"></div>
+        </div>
+        <div class="absolute top-4 right-8  z-50 flex items-center gap-2">
+          <control  v-if="showLf" :lf="lfInstance" ></control>
         </div>
         <div class="w-0 items-center justify-center border border-gray-300">
           <div
             class="w-[24px] h-[24px] rounded-full bg-[#ffffff] relative z-50 -ml-3 top-[50%] shadow-md flex items-center justify-center"
-            @click="toggleCollapsed"
-          >
+            @click="toggleCollapsed">
             <SvgSplitLeft v-if="isCollapsed"></SvgSplitLeft>
             <SvgSplitRight v-else></SvgSplitRight>
           </div>
@@ -34,8 +36,21 @@
             <!-- 头 -->
             <div class="p-3 border-b bg-gray-50">属性设值</div>
             <!-- 内容（自动高度） -->
-            <div class="flex-1 p-4 overflow-auto">
-              <slot name="property"></slot>
+            <div class="flex-1 pt-4 overflow-auto">
+              <div class="flex-1 p-1 space-y-3 overflow-y-auto">
+                <div class="flex items-center">
+                  <label class="w-20 text-sm text-gray-600">节点名称</label>
+                  <Input v-model:="formData.name"  class="flex-1 px-2 py-1.5 border rounded text-sm h-[35px]"/> 
+                </div>
+                <div class="flex items-center">
+                  <label class="w-20 text-sm text-gray-600">服务节点</label>
+                   <VbenSelect :options="data" v-model="formData.node" class="flex-1 px-2 py-1.5 border rounded text-sm h-[35px]"></VbenSelect> 
+                </div>
+                <div class="flex items-center">
+                  <label class="w-20 text-sm text-gray-600">是否重试</label>
+                    <VbenCheckbox class="flex-1 px-2 py-1.5 text-sm h-[35px]"></VbenCheckbox>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -45,14 +60,18 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch, reactive } from 'vue';
+import { onMounted, ref, watch, reactive} from 'vue';
+import type { PropType } from 'vue';
 import LogicFlow from '@logicflow/core';
 import { Menu, Snapshot, MiniMap } from '@logicflow/extension';
 import { SvgSplitLeft, SvgSplitRight } from '@vben/icons';
+
+import {Input,VbenSelect,VbenCheckbox} from '@vben-core/shadcn-ui';
 import '@logicflow/core/lib/style/index.css';
 import '@logicflow/extension/lib/style/index.css';
 import dnd from './layout/dnd.vue';
 import toolbar from './layout/toolbar.vue';
+import control from './layout/control.vue';
 import startNode from './nodes/start/start-node';
 import whenNode from './nodes/when/when-node';
 import commonNode from './nodes/common/common-node';
@@ -73,13 +92,18 @@ const emits = defineEmits([
 const lfInstance = ref();
 const showLf = ref(false);
 const isCollapsed = ref(false); // 折叠状态
+ 
+const  props =defineProps({
+          data: { type: Object as PropType<any>, default: () => { } },//数据
+          title: {type: String, default:''}//标题
+})
 
-const props = withDefaults(defineProps<Props>(), {});
 
-interface Props {}
-//弹出框
-const nodeData = ref({});
-const isPanle = ref(false);
+const formData = reactive({
+       name: "",
+       node: "",
+});
+const nodeId = ref(''); 
 
 defineOptions({
   name: 'Liteflow',
@@ -102,8 +126,7 @@ const registerElements = (lf: LogicFlow) => {
 };
 
 const LfEvent = (lf: LogicFlow) => {
-  lf.on('node:dbclick', ({ data }) => {
-    nodeData.value = data;
+  lf.on('node:dbclick', ({ data }) => { 
     if (
       [
         'startNode',
@@ -117,13 +140,14 @@ const LfEvent = (lf: LogicFlow) => {
         'summaryNode',
       ].includes(data.type)
     ) {
-      emits('on-properties', { lf, data });
+       emits('on-properties', data);
+       formData.name = data?.text?.value
+       nodeId.value = data.id
     }
   });
   lf.on('edge:dbclick', ({ data }) => {
     const nodeConfig = lf.getNodeDataById(data.sourceNodeId);
-    if (nodeConfig?.type === 'if') {
-      isPanle.value = true;
+    if (nodeConfig?.type === 'if') { 
       data.properties = {
         if: true,
       };
@@ -147,43 +171,37 @@ const LfEvent = (lf: LogicFlow) => {
   lf.on('edge:delete', ({ data }) => {});
 };
 
-const customTheme = reactive({
-  background: {
-    backgroundColor: '#f0f4fb',
-  },
-  grid: {
-    size: 10,
-    type: 'dot',
-    config: {
-      color: '#ababab',
-      thickness: 1,
-    },
-  },
-  keyboard: {
-    enabled: true,
-  },
-  adjustEdge: false, //允许调整边
-  adjustEdgeStartAndEnd: false, //是否允许拖动边的端点来调整连线
-  edgeSelectedOutline: true, //鼠标 hover 的时候显示边的外框
-  // edgeTextDraggable: true,
-  hoverOutline: false,
-  nodeTextEdit: false, //节点是否可编辑。false不可编辑
-  edgeTextEdit: false, //边是否可编辑。false不可编辑
-  autoExpand: false, //点拖动靠近画布边缘时是否自动扩充画布
-  textEdit: false, //是否开启文本编辑
-  snapline: false, //对齐线。false不开启
-});
+ 
 
 onMounted(() => {
   if (!container.value) return;
   lfInstance.value = new LogicFlow({
-    ...customTheme,
-    container: container.value,
-    plugins: [Menu, MiniMap, Snapshot],
-    nodeText: {
-      textAnchor: 'middle',
-      textVerticalAlign: 'middle',
+    background: {
+      backgroundColor: '#f0f4fb',
     },
+    grid: {
+      size: 10,
+      type: 'dot',
+      config: {
+        color: '#ababab',
+        thickness: 1,
+      },
+    },
+    keyboard: {
+      enabled: true,
+    },
+    adjustEdge: false, //允许调整边
+    adjustEdgeStartAndEnd: false, //是否允许拖动边的端点来调整连线
+    edgeSelectedOutline: true, //鼠标 hover 的时候显示边的外框
+    // edgeTextDraggable: true,
+    hoverOutline: false,
+    nodeTextEdit: false, //节点是否可编辑。false不可编辑
+    edgeTextEdit: false, //边是否可编辑。false不可编辑
+    autoExpand: false, //点拖动靠近画布边缘时是否自动扩充画布
+    textEdit: false, //是否开启文本编辑
+    snapline: false, //对齐线。false不开启,
+    container: container.value,
+    plugins: [Menu, MiniMap, Snapshot]
   });
   const lf = lfInstance.value;
   showLf.value = true;
@@ -280,4 +298,16 @@ const liteFlowRender = (data: any) => {
 const toggleCollapsed = () => {
   isCollapsed.value = !isCollapsed.value;
 };
+
+ 
+
+//监听formData数据变化
+watch(
+  formData,
+  (newVal:any) => {  
+    lfInstance.value.setProperties(nodeId.value, {name: newVal?.name});
+    lfInstance.value.updateText(nodeId.value, newVal?.name);
+  },
+  { deep: true }, // 监听对象必须加 deep
+);
 </script>

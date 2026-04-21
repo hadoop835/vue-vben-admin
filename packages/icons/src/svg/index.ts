@@ -28,6 +28,17 @@ const SvgLiteflowIteratorIcon = createIconifyIcon('svg:liteflow-iterator');
 const SvgLiteflowIfIcon = createIconifyIcon('svg:liteflow-if');
 const SvgLiteflowSummaryIcon = createIconifyIcon('svg:liteflow-summary');
 const SvgLiteflowCommonIcon = createIconifyIcon('svg:liteflow-common');
+const SvgLiteflowDowloadIcon = createIconifyIcon('svg:liteflow-dowload');
+const SvgLiteflowPlusIcon = createIconifyIcon('svg:liteflow-plus');
+const SvgLiteflowMinusIcon = createIconifyIcon('svg:liteflow-minus');
+const SvgLiteflowMapIcon = createIconifyIcon('svg:liteflow-map');
+const SvgLiteflowBackIcon = createIconifyIcon('svg:liteflow-back');
+const SvgLiteflowNextIcon = createIconifyIcon('svg:liteflow-next');
+const SvgLiteflowRatioIcon = createIconifyIcon('svg:liteflow-ratio');
+
+
+
+
 
 //
 const SvgSplitLeft = createIconifyIcon('svg:left');
@@ -59,6 +70,13 @@ export {
   SvgLiteflowIfIcon,
   SvgLiteflowSummaryIcon,
   SvgLiteflowCommonIcon,
+  SvgLiteflowDowloadIcon,
+  SvgLiteflowPlusIcon,
+  SvgLiteflowMinusIcon,
+  SvgLiteflowMapIcon,
+  SvgLiteflowBackIcon,
+  SvgLiteflowNextIcon,
+  SvgLiteflowRatioIcon,
   SvgSplitLeft,
   SvgSplitRight,
 };
