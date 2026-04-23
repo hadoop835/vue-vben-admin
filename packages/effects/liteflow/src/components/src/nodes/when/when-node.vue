@@ -1,13 +1,13 @@
 <template>
   <div
     ref="startNode"
-    class="overflow-hidden flex w-42 border items-center justify-between font-medium p-2 cursor-pointer rounded-[5px] bg-[#FFFFFF] border-[#e6f7ff]"
+    class="overflow-hidden flex w-42 border items-center justify-between font-medium  cursor-pointer rounded-[5px] bg-[#FFFFFF] border-[#e6f7ff]"
   >
     <div
       class="flex items-center justify-center gap-5 mx-auto whitespace-nowrap"
     >
       <SvgLiteflowWhenIcon class="-ml-20"></SvgLiteflowWhenIcon>
-      <span class="text-center leading-none p-4"></span>
+      <span class="text-center leading-none p-5"></span>
     </div>
   </div>
 </template>

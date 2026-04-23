@@ -1,16 +1,16 @@
 import { createApp, h } from 'vue';
 import iteratorNode from './iterator-node.vue';
-import LogicFlow from '@logicflow/core';
+import LogicFlow ,{HtmlNode, HtmlNodeModel,GraphModel,type Model,BaseNodeModel} from '@logicflow/core'; 
+type NodeConfig = LogicFlow.NodeConfig;
 import { randomNumber } from '../../utils';
 export default function registerConnect(lf: LogicFlow) {
-  lf.register('iteratorNode', ({ HtmlNode, HtmlNodeModel }) => {
+  lf.register('iteratorNode', () => {
     class htmlIteratorNode extends HtmlNode {
-      setHtml(rootEl) {
+     override setHtml(rootEl:SVGForeignObjectElement) {
         const { model } = this.props;
         const el = document.createElement('div');
         rootEl.innerHTML = '';
         rootEl.appendChild(el);
-
         // Vue 3 使用 createApp 来创建应用实例
         const app = createApp({
           render: () =>
@@ -23,28 +23,28 @@ export default function registerConnect(lf: LogicFlow) {
       }
     }
     class htmlIteratorModel extends HtmlNodeModel {
-      createId() {
+     override createId() {
         return randomNumber(); //id用随机数数字
       }
-      constructor(data, graphModel) {
+      constructor(data: NodeConfig, graphModel: GraphModel) {
         super(data, graphModel);
         this.menu = [
           {
             text: '删除',
-            callback(node) {
+            callback(node:any) {
               lf.deleteNode(node.id);
             },
           },
           {
             text: '复制',
-            callback(node) {
+            callback(node:any) {
               lf.cloneNode(node.id);
             },
           },
         ];
       }
-      getDefaultAnchor() {
-        const { id, x, y, width, _ } = this;
+     override getDefaultAnchor() {
+        const { id, x, y, width } = this;
         const anchors = [];
         anchors.push({
           x: x - width / 2,
@@ -60,20 +60,31 @@ export default function registerConnect(lf: LogicFlow) {
         });
         return anchors;
       }
-      initNodeData(data) {
+      override setAttributes(): void {
+        this.width = 168
+        this.height=42;
+  }
+    override  initNodeData(data:NodeConfig) {
         super.initNodeData(data);
-        const width = 168;
-        const height = 50;
-        this.width = width;
-        this.height = height;
-        this.properties = {
-          nodeType: 'SUMMARY',
-        };
+        this.width = 168
+        this.height=42; 
         this.radius = 50;
-        this.targetRules = [];
-        this.sourceRules = [];
       }
+      override getConnectedTargetRules(): Model.ConnectRule[] {
+        const rules = super.getConnectedTargetRules();
+         const targetRules = [] as Model.ConnectRule[]
+         rules.push(...targetRules);
+        return rules;
+      }
+ 
+       override getConnectedSourceRules(): Model.ConnectRule[] {
+            const rules = super.getConnectedSourceRules();
+            const sourceRules  = [] as  Model.ConnectRule[];
+            rules.push(...sourceRules);
+            return rules;
+       }
     }
+
     return {
       view: htmlIteratorNode,
       model: htmlIteratorModel,

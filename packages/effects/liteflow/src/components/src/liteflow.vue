@@ -88,6 +88,7 @@ const emits = defineEmits([
   'on-render',
   'on-save',
   'on-properties',
+  'on-validate'
 ]);
 const lfInstance = ref();
 const showLf = ref(false);
@@ -153,25 +154,61 @@ const LfEvent = (lf: LogicFlow) => {
       };
       //nodeData.value = data;
     } else {
-      showAttribute.value = false;
+       
     }
     console.log('nodeConfig', data);
   });
   //来自边的事件中心发出的事件
   lf.on('edge:app-config', (data) => {
-    nodeData.value = data;
-    showAttribute.value = true;
+    
   });
   lf.on('element:click', () => {});
-  lf.on('blank:click', () => {});
-  lf.on('connection:not-allowed', (data) => {});
+  lf.on('blank:click', () => {}); 
 
   lf.on('edge:add', ({ data }) => {});
 
   lf.on('edge:delete', ({ data }) => {});
-};
+  
+   //规则提示信息
+  lf.on('connection:not-allowed', ({msg}) => {
+      emits('on-validate',msg)
+  });
+  //外部拖入节点添加时触发
+  lf.on("node:dnd-add", ({ data }) => { 
+   if (data.type === "startNode") {
+    const isValid = checkOnlyOneStartNode(lf);
+    if (!isValid) { 
+      lf.deleteNode(data.id);
+    }
+  }else if(data.type === "endNode"){
+    const isValid = checkOnlyOneEndNode(lf);
+    if (!isValid) { 
+      lf.deleteNode(data.id);
+    }
+  }
+});
 
- 
+};
+//判断开始节点
+const checkOnlyOneStartNode= (lf: LogicFlow) =>{ 
+    const graphData = lf.getGraphData() as LogicFlow.GraphData
+    const startNodes = graphData.nodes.filter((node:any) => node.type === "startNode");
+    if (startNodes.length > 1) {
+       emits('on-validate',"不允许多个开始节点")
+       return false;
+    }
+    return true;
+}
+//判断结束节点
+const checkOnlyOneEndNode= (lf: LogicFlow) =>{ 
+    const graphData = lf.getGraphData() as LogicFlow.GraphData
+    const endNodes = graphData.nodes.filter((node:any) => node.type === "endNode");
+    if (endNodes.length > 1) {
+        emits('on-validate',"不允许多个结束节点")
+       return false;
+    }
+    return true;
+}
 
 onMounted(() => {
   if (!container.value) return;

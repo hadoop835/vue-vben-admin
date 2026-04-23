@@ -1,11 +1,12 @@
 import { createApp, h } from 'vue';
 import startNode from './start-node.vue';
 import { randomNumber } from '../../utils';
-import LogicFlow from '@logicflow/core';
+import LogicFlow ,{HtmlNode, HtmlNodeModel,GraphModel,type Model,BaseNodeModel} from '@logicflow/core'; 
+type NodeConfig = LogicFlow.NodeConfig;
 export default function registerConnect(lf: LogicFlow) {
-  lf.register('startNode', ({ HtmlNode, HtmlNodeModel }) => {
+  lf.register('startNode', () => {
     class startHtmlNode extends HtmlNode {
-      setHtml(rootEl) {
+     override  setHtml(rootEl:SVGForeignObjectElement) {
         const { model } = this.props;
         const el = document.createElement('div');
         rootEl.innerHTML = '';
@@ -21,16 +22,18 @@ export default function registerConnect(lf: LogicFlow) {
         app.mount(el);
       }
     }
+
+
     class startHtmlModel extends HtmlNodeModel {
-      createId() {
+      override  createId() {
         return randomNumber();
       }
-      constructor(data: any, graphModel: any) {
+      constructor(data: NodeConfig, graphModel: GraphModel) {
         super(data, graphModel);
         this.menu = [];
       }
-      getDefaultAnchor() {
-        const { id, x, y, width, height } = this;
+      override  getDefaultAnchor() {
+        const { id, x, y, width } = this;
         const anchors = [];
         anchors.push({
           x: x + width / 2,
@@ -40,29 +43,35 @@ export default function registerConnect(lf: LogicFlow) {
         });
         return anchors;
       }
-      initNodeData(data: any) {
+      override setAttributes(): void {
+        this.width = 168
+        this.height=42;
+  }
+  
+    override initNodeData(data:NodeConfig) {
         super.initNodeData(data);
-        const width = 168;
-        const height = 50;
-        this.width = width;
-        this.height = height;
+        this.width = 168
+        this.height=42;
         this.radius = 50;
-        this.targetRules = [
-          {
-            message: '【开始节点】不允许连接输入',
-            validate: (
-              sourceNode: any,
-              targetNode: any,
-              sourceAnchor: any,
-              targetAnchor: any,
-            ) => {
-              //ElMessage.error('【开始节点】不允许连接输入');
-              return false;
-            },
-          },
-        ];
-        this.sourceRules = [];
       }
+      override getConnectedTargetRules(): Model.ConnectRule[] {
+        const rules = super.getConnectedTargetRules();
+         const targetRules = [{
+          message: '【开始节点】不允许连接输入',
+          validate: () => {
+            return false;
+          },
+        }] as Model.ConnectRule[]
+         rules.push(...targetRules);
+        return rules;
+      }
+ 
+       override getConnectedSourceRules(): Model.ConnectRule[] {
+            const rules = super.getConnectedSourceRules();
+            const sourceRules  = [] as  Model.ConnectRule[];
+            rules.push(...sourceRules);
+            return rules;
+       }
     }
     return {
       view: startHtmlNode,

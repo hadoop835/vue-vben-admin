@@ -34,8 +34,8 @@ const saveFunc = () => {
     let graphData = props.lf.getGraphData();
     let flow =  convertLogicFlowToLiteFlowTree(graphData)  
     let result = convertToLiteFlow(flow);
-    //console.log("json==",JSON.stringify(flow))
-    console.log("json==",result)
+    console.log("json==",JSON.stringify(graphData))
+    //console.log("json==",result)
   };
 
 </script>../adapter/liteflowconverter

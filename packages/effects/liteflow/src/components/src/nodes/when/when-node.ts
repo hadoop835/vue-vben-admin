@@ -1,16 +1,16 @@
 import { createApp, h } from 'vue';
 import whenNode from './when-node.vue';
-import LogicFlow from '@logicflow/core';
+import LogicFlow ,{HtmlNode, HtmlNodeModel,GraphModel,type Model,BaseNodeModel} from '@logicflow/core'; 
+type NodeConfig = LogicFlow.NodeConfig;
 import { randomNumber } from '../../utils';
 export default function registerConnect(lf: LogicFlow) {
-  lf.register('whenNode', ({ HtmlNode, HtmlNodeModel }) => {
+  lf.register('whenNode', () => {
     class htmlWhenNode extends HtmlNode {
-      setHtml(rootEl) {
+     override setHtml(rootEl:SVGForeignObjectElement) {
         const { model } = this.props;
         const el = document.createElement('div');
         rootEl.innerHTML = '';
         rootEl.appendChild(el);
-
         // Vue 3 使用 createApp 来创建应用实例
         const app = createApp({
           render: () =>
@@ -22,29 +22,30 @@ export default function registerConnect(lf: LogicFlow) {
         app.mount(el);
       }
     }
+
     class htmlWhenModel extends HtmlNodeModel {
-      createId() {
+     override createId() {
         return randomNumber(); //id用随机数数字
       }
-      constructor(data, graphModel) {
+      constructor(data: NodeConfig, graphModel: GraphModel) {
         super(data, graphModel);
         this.menu = [
           {
             text: '删除',
-            callback(node) {
+            callback(node:any) {
               lf.deleteNode(node.id);
             },
           },
           {
             text: '复制',
-            callback(node) {
+            callback(node:any) {
               lf.cloneNode(node.id);
             },
           },
         ];
       }
-      getDefaultAnchor() {
-        const { id, x, y, width, height } = this;
+     override getDefaultAnchor() {
+        const { id, x, y, width } = this;
         const anchors = [];
         anchors.push({
           x: x - width / 2,
@@ -60,45 +61,42 @@ export default function registerConnect(lf: LogicFlow) {
         });
         return anchors;
       }
-      initNodeData(data) {
+      override setAttributes(): void {
+        this.width = 168
+        this.height=42;
+  }
+  
+   override initNodeData(data:NodeConfig) {
         super.initNodeData(data);
-        const width = 168;
-        const height = 50;
-        this.width = width;
-        this.height = height;
-        this.properties = {
-          nodeType: 'SUMMARY',
-        };
-        this.radius = 50;
-        this.targetRules = [
+        this.width = 168
+        this.height=42;
+        this.radius = 50; 
+      }
+      override getConnectedTargetRules(): Model.ConnectRule[] {
+        const rules = super.getConnectedTargetRules();
+         const targetRules = [
           {
             message: `【条件节点】只允许一个输入`,
-            validate: (sourceNode, targetNode, sourceAnchor, targetAnchor) => {
+            validate: (_, targetNode:HtmlNodeModel) => {
               const edges = this.graphModel.getNodeIncomingEdge(targetNode.id);
-              if (edges.length >= 1) {
-                ElMessage.error('【条件节点】只允许一个输入');
+              if (edges.length >= 1) { 
                 return false;
               } else {
                 return true;
               }
             },
           },
-        ];
-        this.sourceRules = [
-          //  {
-          //   message: `【条件节点】只允许2个输出`,
-          //   validate: (sourceNode, targetNode, sourceAnchor, targetAnchor) => {
-          //     const edges = this.graphModel.getNodeOutgoingEdge(sourceNode.id);
-          //     if (edges.length >= 2) {
-          //         ElMessage.error('【条件节点】只允许2个输出')
-          //         return false;
-          //      }else{
-          //         return true;
-          //      }
-          //      },
-          //   },
-        ];
+         ] as Model.ConnectRule[]
+         rules.push(...targetRules);
+        return rules;
       }
+ 
+       override getConnectedSourceRules(): Model.ConnectRule[] {
+            const rules = super.getConnectedSourceRules();
+            const sourceRules  = [] as  Model.ConnectRule[];
+            rules.push(...sourceRules);
+            return rules;
+       } 
     }
     return {
       view: htmlWhenNode,

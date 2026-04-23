@@ -73,7 +73,7 @@ const props = defineProps({
 });
 
 let dragRow = reactive({
-  type: '',
+    type: '',
 });
 
 const mousedownFunc = (data: any) => {
@@ -83,4 +83,5 @@ const mousedownFunc = (data: any) => {
     text: data.text,
   });
 };
+
 </script>
